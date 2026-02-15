@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+
+  <h2 class="mb-4">Kategori: {{ category.name }}</h2>
+
+  <div class="row g-3">
+    {% for p in products %}
+      <div class="col-6 col-md-4 col-lg-3">
+        <div class="card h-100">
+
+          {# 🖼️ ÜRÜN GÖRSELİ (KİLİTLİ STANDART) #}
+          {% if p.image %}
+            <img src="{{ p.image.url }}"
+                 class="card-img-top gw-product-img"
+                 alt="{{ p.name }}">
+          {% else %}
+            <img src="https://via.placeholder.com/600x400?text=GriWear"
+                 class="card-img-top gw-product-img"
+                 alt="{{ p.name }}">
+          {% endif %}
+
+          <div class="card-body">
+            <h6 class="card-title mb-1">{{ p.name }}</h6>
+            <div class="text-muted small mb-2">{{ p.category.name }}</div>
+            <div class="fw-bold mb-2">{{ p.price }} ₺</div>
+
+            <a class="btn btn-outline-dark btn-sm"
+               href="{% url 'catalog:product_detail' p.slug %}">
+              Detay
+            </a>
+          </div>
+
+        </div>
+      </div>
+    {% empty %}
+      <p>Bu kategoride ürün yok.</p>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

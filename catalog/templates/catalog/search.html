@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+  <h4>Arama</h4>
+
+  {% if q %}
+    <p><strong>"{{ q }}"</strong> için {{ count }} sonuç</p>
+  {% else %}
+    <div class="alert alert-warning">Arama kelimesi boş olamaz.</div>
+  {% endif %}
+
+  {% if q and count == 0 %}
+    <div class="alert alert-info">Sonuç bulunamadı.</div>
+  {% endif %}
+
+  <div class="row">
+    {% for product in products %}
+      <div class="col-12 col-md-6 col-lg-4 mb-3">
+        <div class="card h-100">
+
+          {% if product.image %}
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+          {% else %}
+            <div class="p-4 text-center">Görsel yok</div>
+          {% endif %}
+
+          <div class="card-body">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">{{ product.price }} ₺</p>
+
+            <a class="btn btn-primary" href="{{ product.get_absolute_url }}">
+              Detay
+            </a>
+
+          </div>
+           {% if product.stock > 0 %}
+  <a class="btn btn-success"
+     href="{% url 'cart:add' product.id %}">
+    Sepete Ekle
+  </a>
+{% else %}
+  <button class="btn btn-secondary" disabled>
+    Stok Yok
+  </button>
+{% endif %}
+
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+{% endblock %}

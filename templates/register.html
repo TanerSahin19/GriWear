@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Kayıt Ol{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <h1 class="h4 mb-3">Kayıt Ol</h1>
+
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        Lütfen hataları düzelt.
+      </div>
+    {% endif %}
+
+    <form method="post" class="card card-body">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label class="form-label">Kullanıcı Adı</label>
+        {{ form.username }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">E-posta (opsiyonel)</label>
+        {{ form.email }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Şifre</label>
+        {{ form.password1 }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Şifre Tekrar</label>
+        {{ form.password2 }}
+      </div>
+
+      <button class="btn btn-dark w-100" type="submit">Hesap Oluştur</button>
+    </form>
+
+    <div class="mt-3 small">
+      Zaten hesabın var mı?
+      <a href="{% url 'accounts:login' %}">Giriş Yap</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

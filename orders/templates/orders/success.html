@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Sipariş Başarılı{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+  <!-- ✅ Onay: Sipariş oluştu -->
+  <h2 class="fw-bold">Sipariş Alındı ✅</h2>
+
+  <!-- ✅ Sipariş numarası -->
+  <p class="text-muted mb-3">Sipariş Numaran: <strong>#{{ order.id }}</strong></p>
+
+  <!-- ✅ Toplam -->
+  <p class="fw-bold">Toplam: {{ order.total }} ₺</p>
+
+  <a class="btn btn-outline-dark" href="{% url 'catalog:product_list' %}">
+    Alışverişe Devam
+  </a>
+
+</div>
+{% endblock %}

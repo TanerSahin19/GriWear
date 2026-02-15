@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+  <h3 class="mb-3">Yeni Gelenler</h3>
+
+  {% if products %}
+    <div class="row g-3">
+      {% for p in products %}
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card h-100">
+            {% if p.image %}
+           <img src="{{ p.image.url }}" class="card-img-top gw-product-img" alt="{{ p.name }}">
+           {% endif %}
+
+            <div class="card-body">
+              <h6 class="card-title mb-1">{{ p.name }}</h6>
+              <div class="mb-2"><strong>{{ p.price }} ₺</strong></div>
+              <a class="btn btn-sm btn-outline-dark" href="{% url 'catalog:product_detail' p.slug %}">Detay</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Yeni gelen ürün yok.</p>
+  {% endif %}
+</div>
+{% endblock %}

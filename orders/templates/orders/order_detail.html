@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- ========================================================= -->
+  <!-- 1) SAYFA BAŞLIĞI -->
+  <!-- ========================================================= -->
+  <!-- Kullanıcı hangi siparişte olduğunu net görür -->
+  <h2 class="fw-bold mb-4">
+    Sipariş Detayı — #{{ order.id }}
+  </h2>
+
+
+  <!-- ========================================================= -->
+  <!-- 2) SİPARİŞ BİLGİLERİ (ÜST BİLGİ) -->
+  <!-- ========================================================= -->
+  <div class="card mb-4">
+    <div class="card-body">
+
+      <div class="row g-3">
+
+        <!-- SOL BLOK -->
+        <div class="col-md-6">
+          <p class="mb-1">
+            <strong>Ad Soyad:</strong> {{ order.full_name }}
+          </p>
+
+          <p class="mb-1">
+            <strong>Telefon:</strong> {{ order.phone }}
+          </p>
+
+          <p class="mb-1">
+            <strong>Adres:</strong> {{ order.address }}
+          </p>
+        </div>
+
+        <!-- SAĞ BLOK -->
+        <div class="col-md-6 text-md-end">
+
+          <!-- Tarih -->
+          <p class="mb-1">
+            <strong>Tarih:</strong>
+            {{ order.created_at|date:"d.m.Y H:i" }}
+          </p>
+
+          <!-- ===================================================== -->
+          <!-- STATUS BADGE — Model method kullanıyoruz -->
+          <!-- ===================================================== -->
+          <p class="mb-1">
+            <strong>Durum:</strong>
+            <span class="badge {{ order.status_badge_class }}">
+              {{ order.get_status_display }}
+            </span>
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- 3) SİPARİŞ ÜRÜNLERİ (OrderItem Snapshot) -->
+  <!-- ========================================================= -->
+  <div class="card">
+    <div class="card-body">
+
+      <h5 class="mb-3">Ürünler</h5>
+
+      <!-- ===================================================== -->
+      <!-- ORDERITEM LOOP -->
+      <!-- Snapshot mantığı:
+           - item.name
+           - item.unit_price
+           - item.quantity
+           Fiyat değişse bile sipariş bozulmaz.
+      ====================================================== -->
+      {% for item in order.items.all %}
+
+        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+
+          <!-- SOL: Ürün adı + adet -->
+          <div>
+            <div class="fw-semibold">
+              {{ item.name }}
+            </div>
+            <small class="text-muted">
+              Adet: {{ item.quantity }}
+            </small>
+          </div>
+
+          <!-- SAĞ: Birim fiyat -->
+          <div class="fw-bold">
+            {{ item.unit_price|floatformat:2 }} ₺
+          </div>
+
+        </div>
+
+      {% empty %}
+        <!-- Normalde olmaz ama güvenlik için -->
+        <p class="text-muted mb-0">
+          Bu siparişte ürün bulunamadı.
+        </p>
+      {% endfor %}
+
+      <!-- ===================================================== -->
+      <!-- TOPLAM -->
+      <!-- ===================================================== -->
+      <div class="d-flex justify-content-end mt-3">
+        <h5 class="fw-bold">
+          Toplam: {{ order.total|floatformat:2 }} ₺
+        </h5>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- 4) İPTAL BLOĞU -->
+  <!-- ========================================================= -->
+
+  <!-- Sadece pending iken iptal butonu görünür -->
+  {% if order.status == "pending" %}
+
+    <form method="post"
+          action="{% url 'orders:cancel_order' order.id %}"
+          class="mt-3">
+
+      {% csrf_token %}
+
+      <button type="submit"
+              class="btn btn-outline-danger">
+        Siparişi İptal Et
+      </button>
+
+    </form>
+
+  {% elif order.status == "cancelled" %}
+
+    <!-- Zaten iptal edilmişse -->
+    <div class="alert alert-secondary mt-3 mb-0">
+      Bu sipariş iptal edilmiştir.
+    </div>
+
+  {% else %}
+
+    <!-- Shipped / Delivered -->
+    <div class="alert alert-light mt-3 mb-0">
+      Bu sipariş artık iptal edilemez.
+    </div>
+
+  {% endif %}
+
+
+  <!-- ========================================================= -->
+  <!-- 5) GERİ DÖN -->
+  <!-- ========================================================= -->
+  <div class="mt-3">
+    <a href="{% url 'orders:my_orders' %}"
+       class="btn btn-outline-dark">
+      ← Siparişlerime Dön
+    </a>
+  </div>
+
+</div>
+{% endblock %}

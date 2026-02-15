@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- ✅ Başlık: Kullanıcıya "Sipariş adımındasın" der -->
+  <h2 class="fw-bold mb-3">Checkout</h2>
+
+  <div class="row g-4">
+
+    <div class="col-lg-7">
+      <!-- 👤 Teslimat Bilgileri: Siparişin nereye gideceğini almak için -->
+      <div class="card">
+        <div class="card-body">
+          <h5 class="mb-3">Teslimat Bilgileri</h5>
+
+          <!-- ✅ Form POST: Sipariş kaydı yazacağımız için post kullanıyoruz -->
+          <form method="post">
+            {% csrf_token %}
+
+            <!-- ✅ Ad Soyad -->
+            <div class="mb-3">
+              <label class="form-label">Ad Soyad</label>
+              {{ form.full_name }}
+            </div>
+
+            <!-- ✅ Telefon -->
+            <div class="mb-3">
+              <label class="form-label">Telefon</label>
+              {{ form.phone }}
+            </div>
+
+            <!-- ✅ Adres -->
+            <div class="mb-3">
+              <label class="form-label">Adres</label>
+              {{ form.address }}
+            </div>
+
+            <!-- ✅ Siparişi Tamamla: Order + OrderItem yazılır, sepet temizlenir -->
+            <button type="submit" class="btn btn-dark">Siparişi Tamamla</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <!-- 🧾 Sipariş Özeti: View hesapladı, burada sadece gösteriyoruz -->
+      <div class="card">
+        <div class="card-body">
+          <h5 class="mb-3">Sipariş Özeti</h5>
+
+          {% for row in items %}
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <div class="fw-semibold">{{ row.product.name }}</div>
+                <div class="text-muted small">Adet: {{ row.quantity }}</div>
+              </div>
+              <div class="fw-bold">{{ row.line_total }} ₺</div>
+            </div>
+          {% endfor %}
+
+          <hr>
+
+          <!-- ✅ Toplam -->
+          <div class="d-flex justify-content-between">
+            <span class="fw-bold">Toplam</span>
+            <span class="fw-bold">{{ total }} ₺</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

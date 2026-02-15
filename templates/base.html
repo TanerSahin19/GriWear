@@ -1,0 +1,371 @@
+{% load static %}
+<!doctype html>
+<html lang="tr">
+  <head>
+    <!-- ✅ META: Sayfanın temel tarayıcı ayarları -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- ✅ TITLE: Her sayfa kendi başlığını block ile değiştirebilir -->
+    <title>{% block title %}GriWear{% endblock %}</title>
+
+    <!-- ✅ FAVICON: Sekme ikonu (opsiyonel) -->
+    <link rel="icon" href="{% static 'img/favicon.ico' %}" />
+
+    <!-- ✅ GOOGLE FONTS: Inter fontu -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- ✅ BOOTSTRAP CSS: Hazır tasarım sistemi -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- ✅ BOOTSTRAP ICONS: İkon seti -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <!-- ✅ FONT AWESOME: Ek ikon seti (opsiyonel) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <!-- ✅ PROJECT STATIC CSS: Proje özel stil dosyası -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <!-- ✅ KİLİTLİ MINI STİL: Tema yardımcı sınıfları -->
+    <style>
+      :root {
+        --accent: #111827;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Arial,
+          sans-serif;
+      }
+
+      .gw-topline {
+        font-size: 0.9rem;
+      }
+
+      .gw-brand {
+        font-weight: 800;
+        letter-spacing: 0.3px;
+        text-decoration: none;
+        color: #111;
+      }
+      .gw-brand:hover {
+        color: #111;
+      }
+
+      .gw-menu .nav-link {
+        font-weight: 600;
+      }
+
+      .gw-pill {
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 999px;
+        padding: 0.35rem 0.75rem;
+      }
+
+      .gw-search .form-control {
+        border-radius: 999px;
+      }
+      .gw-search .btn {
+        border-radius: 999px;
+      }
+
+      .gw-footer a {
+        color: inherit;
+        text-decoration: none;
+        opacity: 0.85;
+      }
+      .gw-footer a:hover {
+        opacity: 1;
+      }
+
+      .gw-product-img {
+        height: 260px !important;
+        width: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+      }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+  </head>
+
+  <body class="bg-white text-dark">
+    <!-- ✅ TOP INFO LINE: Üst bilgilendirme satırı (kampanya + whatsapp) -->
+    <div class="border-bottom">
+      <div
+        class="container py-2 d-flex justify-content-between align-items-center gw-topline"
+      >
+        <div class="text-muted">
+          <i class="bi bi-lightning-charge"></i>
+          Bugün Al, Yarın Öde
+        </div>
+        <div class="text-muted">
+          <i class="bi bi-whatsapp"></i>
+          WhatsApp Destek Hattı:
+          <a
+            class="text-decoration-none"
+            href="https://wa.me/905XXXXXXXXX"
+            target="_blank"
+            rel="noopener"
+          >
+            +90 5XX XXX XX XX
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ HEADER: Logo + Arama + Hesap + Sepet -->
+    <header class="border-bottom">
+      <div
+        class="container py-3 d-flex gap-3 align-items-center justify-content-between flex-wrap"
+      >
+        <!-- ✅ LOGO: Ana sayfaya dönüş -->
+        <div class="d-flex align-items-center gap-2">
+          <a class="gw-brand fs-4" href="{% url 'home' %}">GRIWEAR</a>
+        </div>
+
+        <!-- ✅ SEARCH: Şimdilik sadece görünüm (action sonra bağlanır) -->
+     <!-- ✅ SEARCH: Arama endpoint'ine GET ile gider -->
+       <form class="d-flex" method="get" action="{% url 'catalog:search' %}">
+  <input
+    class="form-control me-2"
+    type="search"
+    name="q"
+    placeholder="Arama"
+    value="{{ request.GET.q }}"
+  >
+  <button class="btn btn-outline-dark" type="submit">
+    Ara
+  </button>
+</form>
+
+
+        <!-- ✅ ACCOUNT + CART: Kullanıcı giriş durumuna göre değişir -->
+        <div class="d-flex align-items-center gap-2">
+          <!-- ✅ AUTH: Giriş yapan kullanıcı -->
+          {% if user.is_authenticated %}
+          <!-- ✅ USERNAME: giriş yapıldığını göster -->
+          <span class="gw-pill d-inline-flex align-items-center gap-2">
+            <i class="bi bi-person-check"></i>
+            <span class="d-none d-sm-inline">{{ user.username }}</span>
+          </span>
+
+          <!-- ✅ MY ORDERS: sadece giriş yapan görür -->
+          <a
+            href="{% url 'orders:my_orders' %}"
+            class="btn btn-sm btn-outline-dark"
+          >
+            Siparişlerim
+
+            <!-- NEDEN if?
+       Sipariş yoksa badge göstermeyip temiz kalsın -->
+            {% if orders_count %}
+            <span class="badge text-bg-dark ms-1">{{ orders_count }}</span>
+            {% endif %}
+          </a>
+
+          <!-- ✅ LOGOUT -->
+          <a
+            class="gw-pill d-inline-flex align-items-center gap-2"
+            href="{% url 'accounts:logout' %}"
+          >
+            <i class="bi bi-box-arrow-right"></i>
+            <span class="d-none d-sm-inline">Çıkış</span>
+          </a>
+          {% else %}
+          <!-- ✅ LOGIN -->
+          <a
+            class="gw-pill d-inline-flex align-items-center gap-2"
+            href="{% url 'accounts:login' %}"
+          >
+            <i class="bi bi-person"></i>
+            <span class="d-none d-sm-inline">Üye Girişi</span>
+          </a>
+
+          <!-- ✅ REGISTER -->
+          <a
+            class="gw-pill d-inline-flex align-items-center gap-2"
+            href="{% url 'accounts:register' %}"
+          >
+            <i class="bi bi-person-plus"></i>
+            <span class="d-none d-sm-inline">Kayıt Ol</span>
+          </a>
+          {% endif %}
+
+          <!-- ✅ CART: Sepet her zaman görünür (cart_count context_processor) -->
+          <a
+            class="gw-pill d-inline-flex align-items-center gap-2"
+            href="{% url 'cart:detail' %}"
+          >
+            <i class="bi bi-bag"></i>
+            <span class="d-none d-sm-inline">Sepet</span>
+            <span class="badge bg-dark">{{ cart_count }}</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- ✅ MENU BAR: Kategori linkleri -->
+      <nav class="bg-white">
+        <div class="container">
+          <ul class="nav gw-menu py-2 gap-1 flex-wrap">
+            <li class="nav-item">
+              <a
+                class="nav-link text-dark"
+                href="{% url 'catalog:new_arrivals' %}"
+                >Yeni Gelenler</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link text-dark"
+                href="{% url 'catalog:category_products' slug='ust-giyim' %}"
+                >Üst Giyim</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link text-dark"
+                href="{% url 'catalog:category_products' slug='alt-giyim' %}"
+                >Alt Giyim</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link text-dark"
+                href="{% url 'catalog:category_products' slug='dis-giyim' %}"
+                >Dış Giyim</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link text-dark"
+                href="{% url 'catalog:category_products' slug='aksesuar' %}"
+                >Aksesuar</a
+              >
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <!-- ✅ MAIN: Her sayfa buraya kendi içeriğini basar -->
+    <main class="container py-4">
+      <!-- ✅ DJANGO MESSAGES: Kullanıcıya bilgi/hata mesajı gösterir -->
+      <!-- Örn: "Bu ürün tükendi", "Stok limiti aşılamaz", "Sipariş alındı" -->
+      {% if messages %}
+      <div class="mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} mb-2" role="alert">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- ✅ CONTENT: Her sayfanın asıl gövdesi -->
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- ✅ FOOTER: İletişim + sosyal + alt linkler -->
+    <footer class="border-top">
+      <div class="container py-4 gw-footer">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-6">
+            <div class="fw-bold">GriWear</div>
+            <div class="text-muted small">
+              Minimal giyim, net stil. Siyah-beyaz + tek vurgu rengi.
+            </div>
+            <div class="text-muted small mt-2">
+              <i class="bi bi-envelope"></i> destek@griwear.com
+              <span class="mx-2">•</span>
+              <i class="bi bi-telephone"></i> +90 5XX XXX XX XX
+            </div>
+          </div>
+
+          <!-- ✅ SOCIAL: Sosyal medya ikonları -->
+          <div class="col-md-6 d-flex justify-content-md-end gap-3">
+            <a
+              href="https://instagram.com/"
+              target="_blank"
+              rel="noopener"
+              aria-label="Instagram"
+            >
+              <i class="bi bi-instagram fs-4"></i>
+            </a>
+            <a
+              href="https://tiktok.com/"
+              target="_blank"
+              rel="noopener"
+              aria-label="TikTok"
+            >
+              <i class="bi bi-tiktok fs-4"></i>
+            </a>
+            <a
+              href="https://youtube.com/"
+              target="_blank"
+              rel="noopener"
+              aria-label="YouTube"
+            >
+              <i class="bi bi-youtube fs-4"></i>
+            </a>
+            <a
+              href="https://x.com/"
+              target="_blank"
+              rel="noopener"
+              aria-label="X"
+            >
+              <i class="bi bi-twitter-x fs-4"></i>
+            </a>
+            <a
+              href="https://facebook.com/"
+              target="_blank"
+              rel="noopener"
+              aria-label="Facebook"
+            >
+              <i class="bi bi-facebook fs-4"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- ✅ LEGAL / ALT MENÜ: KVKK vb linkler -->
+        <div
+          class="mt-3 small text-muted d-flex justify-content-between flex-wrap gap-2"
+        >
+          <div>© {% now "Y" %} GriWear — Tüm hakları saklıdır.</div>
+          <div class="d-flex gap-3">
+            <a href="#" class="text-muted">KVKK</a>
+            <a href="#" class="text-muted">Mesafeli Satış</a>
+            <a href="#" class="text-muted">İade</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ✅ BOOTSTRAP JS: Bootstrap bileşenleri çalışsın -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ✅ EXTRA JS: Sayfaya özel script alanı (opsiyonel) -->
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

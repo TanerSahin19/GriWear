@@ -1,0 +1,37 @@
+{% extends "base.html" %} {% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    <div class="col-md-5">
+      {% if product.image %}
+      <img
+        src="{{ product.image.url }}"
+        class="img-fluid rounded"
+        alt="{{ product.name }}"
+      />
+      {% else %}
+      <div class="border rounded p-5 text-center">Görsel yok</div>
+      {% endif %}
+    </div>
+
+    <div class="col-md-7">
+      <h3 class="mb-2">{{ product.name }}</h3>
+      <h5 class="mb-3">{{ product.price }} ₺</h5>
+
+      {% if product.description %}
+      <p class="mb-4">{{ product.description }}</p>
+      {% endif %}
+
+      <!-- Sepete Ekle BUTONU burada olur -->
+      <form method="post" action="{% url 'cart:add' product.id %}">
+        {% csrf_token %} {% if product.stock > 0 %}
+        <button type="submit" class="btn btn-dark">Sepete Ekle</button>
+        {% else %}
+        <button type="button" class="btn btn-secondary" disabled>
+          Tükendi
+        </button>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

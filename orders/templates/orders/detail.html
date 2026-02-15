@@ -1,0 +1,106 @@
+{% extends "base.html" %} {% block title %}Sipariş Detayı{% endblock %} {% block
+content %}
+<div class="container py-4">
+  <!-- 🧾 SAYFA BAŞLIĞI
+       Kullanıcı hangi siparişte olduğunu net görsün -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">Sipariş #{{ order.id }}</h2>
+
+    <!-- 🔙 GERİ DÖN
+         Kullanıcı sipariş listesine kolayca dönebilsin -->
+    <a href="{% url 'orders:my_orders' %}" class="btn btn-sm btn-outline-dark">
+      Siparişlerime Dön
+    </a>
+  </div>
+  {% if order.status == "pending" %}
+  <form method="post" action="{% url 'orders:cancel_order' order.id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Siparişi İptal Et</button>
+  </form>
+  {% endif %}
+
+  <div class="row g-4">
+    <!-- 📦 SOL TARAF: SİPARİŞTEKİ ÜRÜNLER -->
+    <div class="col-lg-7">
+      <div class="card">
+        <div class="card-body">
+          <!-- Başlık -->
+          <h5 class="mb-3">Ürünler</h5>
+
+          <!-- 🔁 Bu siparişe ait tüm ürünleri (OrderItem) dolaş -->
+          <h5 class="mb-3">Ürünler</h5>
+
+          {% for item in order.items.all %}
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <div class="fw-semibold">{{ item.name }}</div>
+              <div class="text-muted small">Adet: {{ item.quantity }}</div>
+            </div>
+
+            <div class="text-end">
+              <div class="fw-semibold">
+                {{ item.unit_price|floatformat:2 }} ₺
+              </div>
+              <div class="small text-muted">
+                Toplam: {{ item.line_total|floatformat:2 }} ₺
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <p>Bu siparişte ürün bulunamadı.</p>
+          {% endfor %}
+
+          <!-- Eğer siparişte ürün yoksa (normalde olmaz ama güvenlik) -->
+          <p>Bu siparişte ürün bulunamadı.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 🧾 SAĞ TARAF: SİPARİŞ ÖZETİ -->
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="mb-3">Sipariş Özeti</h5>
+
+          <!-- 📅 Sipariş tarihi -->
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Tarih</span>
+            <span>{{ order.created_at|date:"d.m.Y H:i" }}</span>
+          </div>
+
+          <!-- 📦 Sipariş durumu -->
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Durum</span>
+            <span class="fw-semibold">
+              <span class="fw-semibold">{{ order.get_status_display }}</span>
+            </span>
+          </div>
+
+          <hr />
+
+          <!-- 💰 Toplam tutar -->
+          <div class="d-flex justify-content-between mb-3">
+            <span class="fw-bold">Toplam</span>
+            <span class="fw-bold">{{ order.total|floatformat:2 }} ₺</span>
+          </div>
+
+          <hr />
+
+          <!-- 🚚 TESLİMAT BİLGİLERİ -->
+          <h6 class="fw-bold mt-2">Teslimat</h6>
+
+          <div class="text-muted small">Ad Soyad</div>
+          <div class="mb-2">{{ order.full_name }}</div>
+
+          <div class="text-muted small">Telefon</div>
+          <div class="mb-2">{{ order.phone }}</div>
+
+          <div class="text-muted small">Adres</div>
+          <div>{{ order.address }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

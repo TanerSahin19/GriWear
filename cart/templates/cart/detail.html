@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+
+  <h3 class="mb-3">Sepet</h3>
+
+  {% if items %}
+
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Ürün</th>
+            <th style="width:140px;">Adet</th>
+            <th style="width:160px;">Ara Toplam</th>
+            <th style="width:140px;"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for item in items %}
+            <tr>
+              <td>
+                <strong>{{ item.product.name }}</strong><br>
+                <small>{{ item.product.price }} ₺</small>
+              </td>
+
+              <td>
+                <div class="d-flex gap-2 align-items-center">
+
+                  <!-- ================================================= -->
+                  <!-- 1) ✅ + (ARTTIR) — NEDEN FORM? -->
+                  <!-- ================================================= -->
+                  <!-- Çünkü sepete ekleme "veri değiştirir" → POST olmalı -->
+                  <form method="post" action="{% url 'cart:add' item.product.id %}" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-dark">+</button>
+                  </form>
+
+                  <span>{{ item.qty }}</span>
+                </div>
+              </td>
+
+              <td>
+                <strong>{{ item.subtotal }} ₺</strong>
+              </td>
+
+              <td>
+                <!-- ================================================= -->
+                <!-- 2) ✅ KALDIR — NEDEN FORM? -->
+                <!-- ================================================= -->
+                <!-- Çünkü sepetten silme "veri değiştirir" → POST olmalı -->
+                <form method="post" action="{% url 'cart:remove' item.product.id %}" class="m-0">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger">
+                    Kaldır
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+
+      </table>
+    </div>
+
+    <div class="d-flex justify-content-end">
+      <h5 class="mb-0">Toplam: <strong>{{ total }} ₺</strong></h5>
+    </div>
+
+    <!-- ================================================= -->
+    <!-- 3) CHECKOUT BUTONU — BU GET OLABİLİR -->
+    <!-- ================================================= -->
+    <!-- Checkout sayfasını GÖSTERMEK veri değiştirmez → GET normal -->
+    <a class="btn btn-dark mt-3" href="{% url 'orders:checkout' %}">
+      Siparişi Tamamla
+    </a>
+
+  {% else %}
+    <p>Sepet boş.</p>
+  {% endif %}
+
+</div>
+{% endblock %}

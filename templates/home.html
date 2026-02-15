@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}GriWear{% endblock %}
+
+{% block content %}
+
+<div id="gwHero" class="carousel slide mb-4" data-bs-ride="carousel">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#gwHero" data-bs-slide-to="0" class="active"></button>
+    <button type="button" data-bs-target="#gwHero" data-bs-slide-to="1"></button>
+  </div>
+
+  <div class="carousel-inner rounded-4 overflow-hidden">
+    <div class="carousel-item active">
+      <img src="{% static 'img/banner-1.jpg' %}" class="d-block w-100 gw-hero-img" alt="Banner 1">
+      <div class="carousel-caption text-start">
+        <h2 class="fw-bold">Yeni Sezon</h2>
+        <p class="mb-3">Minimal stil, net duruş.</p>
+        <a class="btn btn-dark" href="{% url 'catalog:new_arrivals' %}">Yeni Gelenler</a>
+      </div>
+    </div>
+
+    <div class="carousel-item">
+      <img src="{% static 'img/banner-2.jpg' %}" class="d-block w-100 gw-hero-img" alt="Banner 2">
+      <div class="carousel-caption text-start">
+        <h2 class="fw-bold">Tüm Ürünler</h2>
+        <p class="mb-3">Tüm koleksiyonu keşfet.</p>
+        <a class="btn btn-outline-light" href="{% url 'catalog:product_list' %}">Tüm Ürünler</a>
+      </div>
+    </div>
+  </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#gwHero" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </button>
+
+  <button class="carousel-control-next" type="button" data-bs-target="#gwHero" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </button>
+</div>
+
+
+<div class="container py-2">
+
+  <div class="d-flex align-items-end justify-content-between mb-3">
+    <div>
+      <p class="text-muted mb-1">Koleksiyon</p>
+      <h2 class="mb-0 fw-bold">Yeni Gelenler</h2>
+    </div>
+    <a class="btn btn-sm btn-outline-dark" href="{% url 'catalog:new_arrivals' %}">
+      Tümünü Gör
+    </a>
+  </div>
+
+  <div class="row g-3 align-items-stretch">
+    {% for p in new_products %}
+      <div class="col-6 col-md-4 col-lg-3">
+        <a href="{% url 'catalog:product_detail' p.slug %}" class="text-decoration-none text-dark">
+          <div class="card h-100">
+
+            {% if p.image %}
+              <img src="{{ p.image.url }}" class="card-img-top gw-product-img" alt="{{ p.name }}">
+            {% endif %}
+
+            <div class="card-body">
+              <h6 class="card-title mb-1">{{ p.name }}</h6>
+              <div class="fw-bold">{{ p.price }} ₺</div>
+
+              {% if p.is_new %}
+                <span class="badge bg-dark mt-2">Yeni</span>
+              {% endif %}
+
+              <div class="mt-2">
+                <span class="btn btn-sm btn-outline-dark">Detay</span>
+              </div>
+            </div>
+
+          </div>
+        </a>
+      </div>
+    {% empty %}
+      <p>Henüz yeni ürün yok.</p>
+    {% endfor %}
+  </div>
+
+</div>
+
+
+<style>
+  .gw-hero-img{
+    height: 420px;
+    width: 100%;
+    object-fit: cover;
+    object-position: center 10%;
+  }
+
+  .carousel-caption{
+    background: rgba(0,0,0,.35);
+    padding: 16px 20px;
+    border-radius: 14px;
+    max-width: 520px;
+  }
+
+  .gw-product-img{
+    height: 260px;
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+</style>
+
+{% endblock %}
